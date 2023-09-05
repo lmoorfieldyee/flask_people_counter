@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Live Stream - HawkEye{% endblock %}
+{% block head %}
+    {{ super() }}
+    <style>
+    </style>
+{% endblock %}
+
+{% block body %}
+    <h1>Live Stream - HawkEye</h1>
+    <p>Timestamp: <span id="timestamp"></span></p>
+    <p>People in frame: <span id="inframe"></span></p>
+    <p>Total Pedestrian Count: <span id="totalcount"></span></p>
+    <p>Is this actually updating?</p>
+    <div>
+        <img id="video-frame" alt="Video Frame">
+    </div>
+
+    <script>
+        // Function to update the HTML content with JSON data
+        function updateHTML(data) {
+            document.getElementById('timestamp').textContent = data.timestamp;
+            document.getElementById('inframe').textContent = data.inFrameCount;
+            document.getElementById('totalcount').textContent = data.totalCount;
+
+            // Display the video frame from the base64-encoded string
+            const videoFrame = document.getElementById('video-frame');
+            videoFrame.src = 'data:image/jpeg;base64,' + data.videoFrame;
+        }
+
+        // Open a connection to the /sse route for SSE
+        const eventSource = new EventSource("/sse");
+        eventSource.onmessage = (event) => {
+            const data = JSON.parse(event.data);
+            // Call the updateHTML function to display the data
+            updateHTML(data);
+        };
+    </script>
+{% endblock %}
+
